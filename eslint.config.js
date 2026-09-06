@@ -12,7 +12,23 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {
-    languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname } },
+    languageOptions: {
+      parserOptions: {
+        // allowDefaultProject covers the loose scripts that no tsconfig
+        // includes — build config and one-off migration scripts. Without it
+        // each one is a parse error, and a parse error is a file the linter
+        // did not read, reported in the same red as a real finding.
+        projectService: {
+          allowDefaultProject: [
+            "eslint.config.js",
+            "postcss.config.mjs",
+            "docker/migrate.mjs",
+            "scripts/*.mjs",
+          ],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-misused-promises": "error",
