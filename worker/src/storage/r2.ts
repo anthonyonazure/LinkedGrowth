@@ -63,7 +63,8 @@ async function selfHostedBucket(): Promise<Bucket | null> {
     log("the storage endpoint is not a url", { endpoint: row.s3Endpoint });
     return null;
   }
-  const isR2 = endpoint.host.endsWith(R2_HOST);
+  // A dot boundary, so evil-r2.dev is not read as Cloudflare's own host.
+  const isR2 = endpoint.host === R2_HOST || endpoint.host.endsWith(`.${R2_HOST}`);
   return {
     host: endpoint.host,
     origin: endpoint.origin,

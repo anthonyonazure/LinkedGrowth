@@ -16,6 +16,7 @@ import { requireEnv } from "./config.ts";
  */
 
 const ALGORITHM = "aes-256-gcm";
+const AUTH_TAG_LENGTH = 16;
 
 function key(): Buffer {
   const raw = requireEnv("ENCRYPTION_KEY");
@@ -35,8 +36,19 @@ export function decryptSecret(value: string | null | undefined): string | null {
     throw new Error("Encrypted value is not in iv:authTag:ciphertext form");
   }
   const [ivHex, tagHex, dataHex] = parts as [string, string, string];
-  const decipher = createDecipheriv(ALGORITHM, key(), Buffer.from(ivHex, "hex"));
-  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+  // GCM accepts a truncated tag (4, 8, 12, 13, 14, 15 or 16 bytes), and a
+  // shorter tag is proportionally easier to forge: at 4 bytes an attacker
+  // succeeds once in 2^32 tries rather than once in 2^128. The tag arrives
+  // inside the stored string, so its length is attacker-controlled and is
+  // checked here rather than trusted. Matches src/lib/encryption.ts.
+  const tag = Buffer.from(tagHex, "hex");
+  if (tag.length !== AUTH_TAG_LENGTH) {
+    throw new Error("Encrypted value is not in iv:authTag:ciphertext form");
+  }
+  const decipher = createDecipheriv(ALGORITHM, key(), Buffer.from(ivHex, "hex"), {
+    authTagLength: AUTH_TAG_LENGTH,
+  });
+  decipher.setAuthTag(tag);
   let out = decipher.update(dataHex, "hex", "utf8");
   out += decipher.final("utf8");
   return out;

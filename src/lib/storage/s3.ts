@@ -49,7 +49,20 @@ export class S3Storage implements StorageDriver {
 
   constructor(options: S3StorageOptions) {
     const endpoint = options.endpoint.replace(/\/+$/, "");
-    const isR2 = endpoint.includes(R2_HOST);
+    // A substring match reads evil-r2.dev.example.com as Cloudflare. This one
+    // only picks a default region, but the same shape one file away was a
+    // server-side request forgery, so it is spelled the same way here.
+    //
+    // Parsed in a try: an unconfigured instance has an empty endpoint, which
+    // is a supported state handled by isConfigured below, and throwing here
+    // would turn "storage is not set up yet" into a crash on construction.
+    let isR2 = false;
+    try {
+      const host = new URL(endpoint).hostname;
+      isR2 = host === R2_HOST || host.endsWith(`.${R2_HOST}`);
+    } catch {
+      isR2 = false;
+    }
     const region = options.region || (isR2 ? "auto" : "us-east-1");
     const accessKeyId = options.accessKeyId || "";
     const secretAccessKey = options.secretAccessKey || "";

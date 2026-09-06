@@ -23,6 +23,12 @@ import { defineConfig } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "tests/e2e",
+  // Without this the default config sweeps in the other two specs, which have
+  // their own configs, their own ports and their own servers: the compose spec
+  // expects a Docker stack on 3000 and the countries spec its own instance on
+  // 3126. Both then run against the wizard's server on 3125 and fail for a
+  // reason that has nothing to do with what they test.
+  testMatch: /setup-wizard\.spec\.ts/,
   timeout: 180_000,
   expect: { timeout: 30_000 },
   retries: 0,
@@ -43,6 +49,15 @@ export default defineConfig({
       TURSO_DATABASE_URL: "file:/tmp/lg-wizard.db",
       STORAGE_ROOT: "/tmp/lg-wizard-uploads",
       LINKEDGROW_EDITION: "self-hosted",
+      // Throwaway values for a throwaway instance, the same way
+      // playwright.countries.config.ts does it. Without them NextAuth has no
+      // secret, every sign in redirects to ?error=Configuration, and the run
+      // fails on the setup page assertion — which reads as the wizard being
+      // broken rather than the run being unconfigured. Requiring a developer's
+      // own .env.local is what made this spec unrunnable in CI.
+      AUTH_SECRET: "wizard-probe-auth-secret-not-a-real-one",
+      AUTH_TRUST_HOST: "true",
+      ENCRYPTION_KEY: "0".repeat(64),
     },
   },
 });

@@ -1,0 +1,75 @@
+name: end to end
+# The browser gate. Every other gate reads code that is standing still; these
+# start the application and drive it through a real Chromium.
+#
+# The specs already existed in tests/e2e and nothing in CI ran them, so they
+# passed or failed only when somebody remembered to run them by hand. A test
+# nobody runs is documentation, and out-of-date documentation at that.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: e2e-gates-${{ github.ref }}
+  cancel-in-progress: true
+# Read-only by default. A workflow that can write to the repo is a workflow an
+# attacker who lands code in a pull request can write to the repo with.
+permissions:
+  contents: read
+jobs:
+  browser:
+    name: browser flows (playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # Actions are pinned to a commit, not a tag. A tag is a moving pointer the
+      # action's owner can repoint at any time, so `@v7` is a promise to run
+      # whatever that account publishes next, on a runner holding this repo's
+      # secrets. persist-credentials: false stops the checkout leaving a usable
+      # GitHub token in .git/config where any later step can read it.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: install chromium
+        run: npx playwright install --with-deps chromium
+      - name: build
+        # Both self-contained specs run `next start`, which serves what
+        # `next build` produced. Without this they would test the previous
+        # build, or nothing at all.
+        run: npm run build
+
+      - name: agent countries
+        # Self-contained: its own port, its own throwaway database, no secrets.
+        # This one always runs, so the gate is never entirely absent.
+        run: npx playwright test -c playwright.countries.config.ts
+
+      - name: setup wizard
+        # Needs a real model key, because the wizard calls a model during the
+        # run. Reported as NOT_ARMED rather than skipped silently: a gate that
+        # quietly does not run looks identical to a gate that passed.
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "${ANTHROPIC_API_KEY}" ]; then
+            echo "GATE setup wizard = NOT_ARMED (no ANTHROPIC_API_KEY secret)" >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning title=setup wizard e2e::NOT_ARMED — add an ANTHROPIC_API_KEY repository secret to run this spec"
+            exit 0
+          fi
+          npx playwright test
+
+      - name: keep the traces
+        # retain-on-failure in both configs, so this uploads only when there is
+        # something to look at. `npx playwright show-trace <file>` replays the
+        # run frame by frame, which is the difference between a red tick and a
+        # diagnosis.
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

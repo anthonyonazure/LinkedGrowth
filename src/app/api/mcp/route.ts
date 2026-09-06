@@ -1152,7 +1152,10 @@ export async function POST(request: NextRequest) {
           } catch {
             host = "";
           }
-          if (!host.endsWith("linkedin.com")) {
+          // endsWith alone accepted notlinkedin.com and my-linkedin.com. The
+          // URL becomes an agent source, and the worker later opens it in a
+          // browser that is signed in to this customer's LinkedIn account.
+          if (host !== "linkedin.com" && !host.endsWith(".linkedin.com")) {
             return rpc(
               id,
               toolText("searchUrl must be an https LinkedIn search URL.", true)
