@@ -7,6 +7,9 @@ import {
   twoFactorChallengeCookieName,
 } from "./two-factor-challenge";
 
+// A fixed value so the suite does not depend on the developer's environment.
+// It signs nothing outside this file and is meant to be public.
+// nosemgrep: generic.secrets.security.detected-generic-secret.detected-generic-secret
 const SECRET = "3d6f45a5fd7b4b0e9c2a1f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1908f7e6";
 
 test("a freshly minted challenge names its account", () => {

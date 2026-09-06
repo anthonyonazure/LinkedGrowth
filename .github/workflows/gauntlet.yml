@@ -37,6 +37,16 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with: { node-version: '22' }
       - run: npm ci
+      - name: install nested packages
+        run: |
+          # A second package.json beside a second lockfile is a second package.
+          find . -mindepth 2 -maxdepth 3 -name package-lock.json \
+            -not -path "*/node_modules/*" -print0 2>/dev/null |
+            while IFS= read -r -d '' lock; do
+              dir=$(dirname "$lock")
+              echo "installing $dir"
+              npm ci --prefix "$dir" --no-audit --no-fund --ignore-scripts
+            done
       - name: typecheck
         run: |
           script=$(node -p "JSON.parse(require('fs').readFileSync('package.json','utf8')).scripts?.typecheck ?? ''" 2>/dev/null || echo "")
@@ -573,6 +583,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { persist-credentials: false }
       - name: audit the workflows that run every other gate
+        # Versions resolved when this repo was armed, not "latest" at run time:
+        # a gate whose scanner can change under it is a gate whose verdict can
+        # change without a commit. --upgrade moves both forward deliberately.
+        env:
+          ACTIONLINT_VERSION: "1.7.12"
+          ZIZMOR_VERSION: "1.30.0"
         run: |
           shopt -s nullglob
           set -- .github/workflows/*.yml .github/workflows/*.yaml
@@ -583,8 +599,10 @@ jobs:
           fi
           echo "auditing $# workflow file(s)" >> "$GITHUB_STEP_SUMMARY"
 
-          curl -sSfL "https://github.com/rhysd/actionlint/releases/latest/download/actionlint_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz"             | tar xz -C /usr/local/bin actionlint
-          pipx install zizmor >/dev/null
+          curl -sSfL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"             | tar xz -C /usr/local/bin actionlint
+          pipx install "zizmor==${ZIZMOR_VERSION}" >/dev/null
+          actionlint --version
+          zizmor --version
 
           set +e
           actionlint -color=never "$@" > actionlint.out 2>&1; lint=$?
@@ -624,8 +642,9 @@ jobs:
       - name: score this repository's own practices
         env:
           GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCORECARD_VERSION: "5.5.0"
         run: |
-          curl -sSfL "https://github.com/ossf/scorecard/releases/download/v5.2.1/scorecard_5.2.1_linux_amd64.tar.gz"             | tar xz -C /usr/local/bin scorecard
+          curl -sSfL "https://github.com/ossf/scorecard/releases/download/v${SCORECARD_VERSION}/scorecard_${SCORECARD_VERSION}_linux_amd64.tar.gz"             | tar xz -C /usr/local/bin scorecard
           set +e
           scorecard --repo="github.com/${{ github.repository }}" --format=default > scorecard.out 2>&1; code=$?
           set -e
