@@ -36,4 +36,12 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  {
+    // node:test's `test()` returns a promise that the runner itself awaits.
+    // Every call in every test file is therefore a floating promise by the
+    // letter of the rule and correct by its intent, and `void test(...)` on
+    // each one is noise that makes real findings harder to see.
+    files: ["**/*.test.ts"],
+    rules: { "@typescript-eslint/no-floating-promises": "off" },
+  },
 );

@@ -67,24 +67,11 @@
     }
   },
   "shared/ai-client.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 3
-    },
     "@typescript-eslint/no-unsafe-member-access": {
       "count": 3
     },
     "@typescript-eslint/require-await": {
       "count": 2
-    }
-  },
-  "shared/ai-models.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
-    }
-  },
-  "shared/countries.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 15
     }
   },
   "src/app/(auth)/forgot-password/page.tsx": {
@@ -2100,11 +2087,6 @@
       "count": 1
     }
   },
-  "src/lib/app-url.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 6
-    }
-  },
   "src/lib/auth.ts": {
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 3
@@ -2116,17 +2098,9 @@
       "count": 1
     }
   },
-  "src/lib/cron-auth.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    }
-  },
   "src/lib/db/migrate.test.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 1
-    },
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
     }
   },
   "src/lib/db/migrate.ts": {
@@ -2144,15 +2118,7 @@
       "count": 6
     }
   },
-  "src/lib/edition.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 3
-    }
-  },
   "src/lib/email/providers.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
-    },
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 2
     },
@@ -2160,23 +2126,8 @@
       "count": 4
     }
   },
-  "src/lib/encryption.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 8
-    }
-  },
   "src/lib/google.ts": {
     "@typescript-eslint/no-unsafe-return": {
-      "count": 2
-    }
-  },
-  "src/lib/instance-settings.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
-    }
-  },
-  "src/lib/plans.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
       "count": 2
     }
   },
@@ -2212,21 +2163,6 @@
       "count": 1
     }
   },
-  "src/lib/registration.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
-    }
-  },
-  "src/lib/session-cookie.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 3
-    }
-  },
-  "src/lib/setup/fields.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 4
-    }
-  },
   "src/lib/storage/canvas-r2-cleanup.ts": {
     "@typescript-eslint/no-unsafe-argument": {
       "count": 2
@@ -2241,24 +2177,9 @@
       "count": 2
     }
   },
-  "src/lib/storage/local.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    }
-  },
   "src/lib/storage/local.ts": {
     "@typescript-eslint/require-await": {
       "count": 2
-    }
-  },
-  "src/lib/storage/media-url.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
-    }
-  },
-  "src/lib/two-factor-challenge.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 7
     }
   },
   "src/lib/user-deletion.ts": {
@@ -2300,11 +2221,6 @@
       "count": 1
     }
   },
-  "worker/src/alert-throttle.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
-    }
-  },
   "worker/src/browser/driver.ts": {
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 2
@@ -2313,21 +2229,6 @@
   "worker/src/browser/human.ts": {
     "@typescript-eslint/await-thenable": {
       "count": 1
-    }
-  },
-  "worker/src/claim-dedupe.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
-    }
-  },
-  "worker/src/cron/pass.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 6
-    }
-  },
-  "worker/src/crypto.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
     }
   },
   "worker/src/db.ts": {
@@ -2353,11 +2254,6 @@
       "count": 8
     }
   },
-  "worker/src/instance.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 4
-    }
-  },
   "worker/src/linkedin/actions.ts": {
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 4
@@ -2366,18 +2262,8 @@
       "count": 3
     }
   },
-  "worker/src/linkedin/competitor.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 10
-    }
-  },
   "worker/src/linkedin/connect-pass.ts": {
     "@typescript-eslint/no-base-to-string": {
-      "count": 6
-    }
-  },
-  "worker/src/linkedin/depth.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
       "count": 6
     }
   },
@@ -2389,9 +2275,6 @@
   "worker/src/linkedin/lead-gate.test.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 1
-    },
-    "@typescript-eslint/no-floating-promises": {
-      "count": 12
     }
   },
   "worker/src/linkedin/lead-profile.ts": {
@@ -2408,9 +2291,6 @@
     }
   },
   "worker/src/linkedin/learning.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 24
-    },
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 1
     }
@@ -2421,11 +2301,6 @@
     },
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 1
-    }
-  },
-  "worker/src/linkedin/miner.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 24
     }
   },
   "worker/src/linkedin/miner.ts": {
@@ -2447,11 +2322,6 @@
       "count": 4
     }
   },
-  "worker/src/linkedin/publish.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 6
-    }
-  },
   "worker/src/linkedin/publish.ts": {
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 1
@@ -2460,17 +2330,9 @@
       "count": 1
     }
   },
-  "worker/src/linkedin/reachable.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 6
-    }
-  },
   "worker/src/linkedin/repetition.test.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 2
-    },
-    "@typescript-eslint/no-floating-promises": {
-      "count": 10
     }
   },
   "worker/src/linkedin/resolve.ts": {
@@ -2488,9 +2350,6 @@
     "@typescript-eslint/no-base-to-string": {
       "count": 13
     },
-    "@typescript-eslint/no-floating-promises": {
-      "count": 44
-    },
     "@typescript-eslint/require-await": {
       "count": 68
     }
@@ -2500,19 +2359,9 @@
       "count": 2
     }
   },
-  "worker/src/linkedin/signin.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 11
-    }
-  },
   "worker/src/linkedin/signin.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 1
-    }
-  },
-  "worker/src/linkedin/sources.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 31
     }
   },
   "worker/src/linkedin/sources.ts": {
@@ -2536,32 +2385,14 @@
       "count": 1
     }
   },
-  "worker/src/linkedin/tier.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 9
-    }
-  },
   "worker/src/linkedin/tier.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 1
     }
   },
   "worker/src/linkedin/viewer-signal.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 3
-    },
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 1
-    }
-  },
-  "worker/src/messages/goal.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 4
-    }
-  },
-  "worker/src/messages/hello.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 14
     }
   },
   "worker/src/messages/relationship.ts": {
@@ -2572,16 +2403,6 @@
       "count": 18
     }
   },
-  "worker/src/messages/validate.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 19
-    }
-  },
-  "worker/src/names.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 14
-    }
-  },
   "worker/src/proxy/adopt.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 2
@@ -2590,11 +2411,6 @@
   "worker/src/proxy/allocation.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 4
-    }
-  },
-  "worker/src/proxy/fulfil.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
     }
   },
   "worker/src/proxy/fulfil.ts": {
@@ -2616,9 +2432,6 @@
   "worker/src/publish/store.test.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 12
-    },
-    "@typescript-eslint/no-floating-promises": {
-      "count": 28
     }
   },
   "worker/src/publish/store.ts": {
@@ -2629,53 +2442,21 @@
   "worker/src/resignin.test.ts": {
     "@typescript-eslint/no-base-to-string": {
       "count": 2
-    },
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
     }
   },
   "worker/src/safety/allowlist.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
-    },
     "@typescript-eslint/require-await": {
       "count": 8
     }
   },
   "worker/src/safety/day.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 15
-    },
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 2
     }
   },
-  "worker/src/safety/envelope.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 1
-    }
-  },
   "worker/src/safety/geo-fence.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 9
-    },
     "@typescript-eslint/require-await": {
       "count": 12
-    }
-  },
-  "worker/src/safety/heartbeat.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
-    }
-  },
-  "worker/src/safety/human-input.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 9
-    }
-  },
-  "worker/src/safety/maturity.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 9
     }
   },
   "worker/src/safety/maturity.ts": {
@@ -2683,66 +2464,13 @@
       "count": 1
     }
   },
-  "worker/src/safety/no-overlap.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 6
-    }
-  },
-  "worker/src/safety/observe.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 2
-    }
-  },
-  "worker/src/safety/reading.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 13
-    }
-  },
-  "worker/src/safety/reaper.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
-    }
-  },
-  "worker/src/safety/rhythm-window.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 8
-    }
-  },
   "worker/src/safety/rhythm.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 21
-    },
     "@typescript-eslint/no-unnecessary-type-assertion": {
       "count": 1
-    }
-  },
-  "worker/src/safety/run-context.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 3
-    }
-  },
-  "worker/src/safety/slots.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 5
     }
   },
   "worker/src/safety/watchdog.ts": {
     "@typescript-eslint/no-unnecessary-type-assertion": {
-      "count": 1
-    }
-  },
-  "worker/src/score.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 13
-    }
-  },
-  "worker/src/settings.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
-      "count": 6
-    }
-  },
-  "worker/src/storage/local.test.ts": {
-    "@typescript-eslint/no-floating-promises": {
       "count": 1
     }
   },
