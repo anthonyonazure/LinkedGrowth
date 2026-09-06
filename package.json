@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint",
+    "test": "node --import tsx --test 'src/**/*.test.ts' 'shared/**/*.test.ts'",
+    "mutation": "stryker run",
+    "check": "bun run typecheck && bun run lint",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "db:seed-admin": "npx tsx src/lib/db/seed-admin.ts",
     "db:migrate": "node --import tsx src/lib/db/migrate-cli.ts",
     "db:clear-2fa": "node scripts/clear-two-factor.mjs",
-    "test": "node --import tsx --test 'src/**/*.test.ts' 'shared/**/*.test.ts'",
     "test:e2e": "playwright test --reporter=line"
   },
   "dependencies": {
@@ -68,7 +71,7 @@
     "next-auth": "^5.0.0-beta.30",
     "next-intl": "^4.7.0",
     "next-themes": "^0.4.6",
-    "nodemailer": "^7.0.12",
+    "nodemailer": "^10.0.0",
     "otplib": "^13.0.2",
     "qrcode": "^1.5.4",
     "react": "^19.2.4",
@@ -83,7 +86,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.4",
     "stripe": "^20.2.0",
     "tailwind-merge": "^3.4.0",
     "unified": "^11.0.5",
@@ -114,7 +117,9 @@
   },
   "overrides": {
     "@smithy/config-resolver": "^4.4.0",
-    "@smithy/util-defaults-mode-node": "^4.0.0"
+    "@smithy/util-defaults-mode-node": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "nodemailer": "^10.0.0"
   },
   "browserslist": [
     "last 2 Chrome versions",
