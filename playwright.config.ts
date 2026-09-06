@@ -23,6 +23,12 @@ import { defineConfig } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "tests/e2e",
+  // Without this the default config sweeps in the other two specs, which have
+  // their own configs, their own ports and their own servers: the compose spec
+  // expects a Docker stack on 3000 and the countries spec its own instance on
+  // 3126. Both then run against the wizard's server on 3125 and fail for a
+  // reason that has nothing to do with what they test.
+  testMatch: /setup-wizard\.spec\.ts/,
   timeout: 180_000,
   expect: { timeout: 30_000 },
   retries: 0,
