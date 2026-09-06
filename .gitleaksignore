@@ -1,0 +1,47 @@
+# Findings gitleaks reports that are not secrets.
+#
+# A scanner that is always red is a scanner people learn to scroll past, and
+# the next real leak arrives in a list of sixteen things everyone already
+# ignores. Every line here is a specific finding, pinned to its commit, with
+# the reason it is not a secret. Nothing here is a blanket rule and no path is
+# excluded wholesale, so a genuine secret in any of these same files is still
+# caught.
+#
+# All sixteen are one of two false positives:
+#
+#   1. The linkedin-client-secret and linkedin-client-id rules match a long
+#      value near the word "linkedin". Every hit is an ordinary variable name
+#      that happens to begin with it: linkedinOrganizations, linkedinBlue,
+#      linkedinPostingTarget, linkedinCard, linkedinAccounts, linkedinPostId.
+#      A colour constant is not a credential.
+#
+#   2. The generic-api-key rule matches long constants assigned to names like
+#      SECRET, KEY and PASSWORD. Every hit is a fixed test value in a test
+#      file, present so the suite does not depend on the developer's own
+#      environment. They authenticate nothing and are meant to be public.
+#
+# Format is commit:path:rule:line. Regenerate a fingerprint with:
+#   gitleaks detect --no-banner --redact -f json -r findings.json
+
+# 1. variable names beginning with "linkedin", not credentials
+53f9434e97b01c3ce037f798e868a5a1660d347c:src/app/api/admin/users/route.ts:linkedin-client-secret:4
+8fbd06079dfd2cce47f4e77f861f5810c6e5d1a1:src/lib/proxy/allocate.ts:linkedin-client-secret:3
+90d094507496a9bfd396a315faed07279b14be6b:src/app/api/linkedin/callback/route.ts:linkedin-client-secret:508
+90d094507496a9bfd396a315faed07279b14be6b:src/app/api/linkedin/callback/route.ts:linkedin-client-secret:510
+82da0cebefba02257afc2fcf11983dcead1b40ed:src/app/api/linkedin/callback/route.ts:linkedin-client-secret:194
+82da0cebefba02257afc2fcf11983dcead1b40ed:src/app/api/linkedin/callback/route.ts:linkedin-client-secret:195
+f39f50df6045121ae8022c01f7270a1ff2d61baa:src/lib/carousel-templates.ts:linkedin-client-secret:308
+601656a208da80585b19bc6c96f29de9eef1e462:src/lib/carousel-templates.ts:linkedin-client-secret:764
+6c92ba797fdc33ca22431a0ff4ab6c3a983ef0b2:src/app/api/linkedin/engagement/route.ts:linkedin-client-id:96
+6c92ba797fdc33ca22431a0ff4ab6c3a983ef0b2:src/app/api/linkedin/engagement/route.ts:linkedin-client-id:113
+73e5c4f2a9c37a3eee7f935ea2f492c0205bfd20:src/app/api/linkedin/callback/route.ts:linkedin-client-secret:393
+73e5c4f2a9c37a3eee7f935ea2f492c0205bfd20:src/app/api/linkedin/callback/route.ts:linkedin-client-secret:395
+
+# 2. fixed test values, public by design, they authenticate nothing
+919e9a093d02bbbbffd540459942218a3267d8fa:src/lib/encryption.test.ts:generic-api-key:7
+919e9a093d02bbbbffd540459942218a3267d8fa:src/lib/encryption.test.ts:generic-api-key:13
+919e9a093d02bbbbffd540459942218a3267d8fa:worker/src/crypto.test.ts:generic-api-key:5
+d7a47ebbef475ebf3e7f9e5fd07b25604cfb1d26:tests/e2e/agent-countries.spec.ts:generic-api-key:19
+633f39dd96fd5de1779ac49fc42752756b47f204:src/lib/two-factor-challenge.test.ts:generic-api-key:9
+633f39dd96fd5de1779ac49fc42752756b47f204:src/lib/session-cookie.test.ts:generic-api-key:6
+8089dd1d8bbbdd803f51321bdeb3f8aae53a57a7:worker/src/instance.test.ts:generic-api-key:10

@@ -95,6 +95,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.62.1",
+    "@stryker-mutator/core": "^10.0.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/bcryptjs": "^2.4.6",
     "@types/dompurify": "^3.0.5",
@@ -121,7 +122,8 @@
     "@smithy/config-resolver": "^4.4.0",
     "@smithy/util-defaults-mode-node": "^4.0.0",
     "esbuild": "^0.28.2",
-    "nodemailer": "^10.0.0"
+    "nodemailer": "^10.0.0",
+    "qs": "^6.15.4"
   },
   "browserslist": [
     "last 2 Chrome versions",
