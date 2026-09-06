@@ -605,7 +605,7 @@ jobs:
           zizmor --version
 
           set +e
-          actionlint -color=never "$@" 2>&1 | tee actionlint.out; lint=${PIPESTATUS[0]}
+          actionlint -no-color "$@" 2>&1 | tee actionlint.out; lint=${PIPESTATUS[0]}
           zizmor --no-progress --min-severity=medium "$@" 2>&1 | tee zizmor.out; zz=${PIPESTATUS[0]}
           set -e
           echo "actionlint exit=$lint  zizmor exit=$zz"
