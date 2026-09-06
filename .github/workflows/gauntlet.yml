@@ -605,10 +605,15 @@ jobs:
           zizmor --version
 
           set +e
-          actionlint -color=never "$@" > actionlint.out 2>&1; lint=$?
-          zizmor --no-progress --min-severity=medium "$@" > zizmor.out 2>&1; zz=$?
+          actionlint -color=never "$@" 2>&1 | tee actionlint.out; lint=${PIPESTATUS[0]}
+          zizmor --no-progress --min-severity=medium "$@" 2>&1 | tee zizmor.out; zz=${PIPESTATUS[0]}
           set -e
+          echo "actionlint exit=$lint  zizmor exit=$zz"
 
+          # tee, not a bare redirect: findings that reach only the step summary
+          # are invisible in the log, and the log is where anyone looking at a
+          # red tick starts. The first version of this gate hid its own failure
+          # that way and cost an extra round trip to diagnose.
           {
             echo "### pipeline security"
             echo '<pre>'
