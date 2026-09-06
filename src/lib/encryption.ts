@@ -44,7 +44,9 @@ export function encrypt(text: string): string {
   const key = getEncryptionKey();
   const iv = randomBytes(IV_LENGTH);
 
-  const cipher = createCipheriv(ALGORITHM, key, iv);
+  const cipher = createCipheriv(ALGORITHM, key, iv, {
+    authTagLength: AUTH_TAG_LENGTH,
+  });
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
 
@@ -69,7 +71,18 @@ export function decrypt(encryptedText: string): string {
   const authTag = Buffer.from(parts[1], "hex");
   const encrypted = parts[2];
 
-  const decipher = createDecipheriv(ALGORITHM, key, iv);
+  // GCM accepts a truncated tag (4, 8, 12, 13, 14, 15 or 16 bytes), and a
+  // shorter tag is proportionally easier to forge: at 4 bytes an attacker
+  // succeeds once in 2^32 tries rather than once in 2^128. The length is
+  // attacker-controlled here, because the tag arrives inside the ciphertext
+  // string, so it is checked before it reaches setAuthTag rather than trusted.
+  if (authTag.length !== AUTH_TAG_LENGTH) {
+    throw new Error("Invalid encrypted text format");
+  }
+
+  const decipher = createDecipheriv(ALGORITHM, key, iv, {
+    authTagLength: AUTH_TAG_LENGTH,
+  });
   decipher.setAuthTag(authTag);
 
   let decrypted = decipher.update(encrypted, "hex", "utf8");
