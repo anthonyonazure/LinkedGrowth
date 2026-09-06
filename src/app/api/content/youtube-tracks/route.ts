@@ -8,6 +8,10 @@ import { checkAIRateLimit } from "@/lib/rate-limit";
 import { getCaptionTrack } from "@/lib/youtube-captions";
 
 function extractVideoId(url: string): string | null {
+  // The pattern contains `.*[?&]v=`, which backtracks, so its cost grows
+  // faster than the input it is given. No YouTube URL is anywhere near this
+  // long, and refusing early turns an open-ended CPU cost into a rejection.
+  if (url.length > 2048) return null;
   const match = url.match(
     /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
   );

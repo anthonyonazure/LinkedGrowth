@@ -58,9 +58,17 @@ export async function GET(request: NextRequest) {
     const urlObj = new URL(url, appOrigin);
     const storage = await getStorage();
     const key = storage.keyFromUrl(url);
+    // `hostname.includes(domain)` accepted r2.dev.attacker.com and also
+    // evil-r2.dev, both of which anyone can register — and the fetch below
+    // then runs from inside the network, which is the whole value of a
+    // server-side request forgery. A host either IS the allowed domain or
+    // sits under it, and the dot is what makes that a boundary rather than
+    // a coincidence of spelling.
+    const hostAllowed = (host: string, domain: string) =>
+      host === domain || host.endsWith(`.${domain}`);
     const isAllowed =
       key !== null ||
-      (isCloud() && allowedDomains.some((domain) => urlObj.hostname.includes(domain)));
+      (isCloud() && allowedDomains.some((domain) => hostAllowed(urlObj.hostname, domain)));
 
     if (!isAllowed) {
       return NextResponse.json({ error: "URL not allowed" }, { status: 403 });

@@ -170,7 +170,11 @@ export async function POST(request: NextRequest) {
     const totpSecret =
       typeof body?.totpSecret === "string" ? body.totpSecret.trim() : "";
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 320) {
+    // Length first. JavaScript evaluates left to right, so the previous order
+    // ran the pattern over an unbounded string before the cap was consulted,
+    // and this pattern backtracks: a long enough value costs real CPU per
+    // request, which is a denial of service anyone with an account can send.
+    if (!email || email.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "A valid email is required" }, { status: 400 });
     }
     if (!password || password.length > 256) {
