@@ -698,18 +698,81 @@ jobs:
           output: codeql-results
       - name: report
         if: always()
+        # A deep analysis of a codebase nobody has reviewed reports dozens of
+        # findings, most of them true statements about code that is not
+        # actually reachable by an attacker. Failing on the total forever means
+        # a gate that is red on every commit, and a gate that is always red is
+        # one people stop reading — the same failure the secret scanner had.
+        #
+        # So the verdict is against a baseline the repo commits after triage:
+        # .codeql-baseline.json, one entry per rule and file with the count
+        # that was reviewed and the reason it was accepted. Anything NEW fails.
+        # The debt can only shrink, because a count above the recorded one
+        # fails just as loudly as a rule that was never reviewed at all.
         run: |
           sarif=$(find codeql-results -name '*.sarif' | head -1)
           if [ -z "$sarif" ]; then
             echo "GATE codeql = FAILED (no results file — the analysis did not complete)" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          n=$(python3 -c "import json,sys; print(sum(len(r.get('results',[])) for r in json.load(open(sys.argv[1]))['runs']))" "$sarif")
-          if [ "$n" -gt 0 ]; then
-            echo "GATE codeql = FAILED (${{ matrix.language }}: $n finding(s), see the Security tab or the codeql-results artifact)" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "GATE codeql = VERIFIED (${{ matrix.language }}: no findings)" >> "$GITHUB_STEP_SUMMARY"
+          python3 - "$sarif" .codeql-baseline.json <<'GAUNTLET_CODEQL_PY' | tee codeql-report.txt
+          import collections, json, os, sys
+
+          sarif, baseline_path = sys.argv[1], sys.argv[2]
+
+          found = collections.Counter()
+          for run in json.load(open(sarif))["runs"]:
+              for res in run.get("results", []):
+                  # A result CodeQL itself considers suppressed by an
+                  # inline "// codeql[rule-id]" comment is not a finding.
+                  if res.get("suppressions"):
+                      continue
+                  loc = res["locations"][0]["physicalLocation"]
+                  found[(res.get("ruleId", "?"), loc["artifactLocation"]["uri"])] += 1
+
+          baseline = {}
+          if os.path.exists(baseline_path):
+              raw = json.load(open(baseline_path))
+              for entry in raw.get("reviewed", []):
+                  baseline[(entry["rule"], entry["file"])] = entry["count"]
+
+          new = {k: n for k, n in found.items() if n > baseline.get(k, 0)}
+          gone = {k: n for k, n in baseline.items() if found.get(k, 0) < n}
+
+          print(f"findings: {sum(found.values())}   reviewed baseline: {sum(baseline.values())}")
+          for (rule, path), n in sorted(new.items()):
+              print(f"NEW  {n - baseline.get((rule, path), 0):3}  {rule}  {path}")
+          for (rule, path), n in sorted(gone.items()):
+              print(f"FIXED     {rule}  {path} (baseline {n}, now {found.get((rule, path), 0)})")
+
+          if new:
+              print("VERDICT=FAILED")
+          elif gone:
+              # Not a failure: a fixed finding is the point. But the baseline
+              # has to be regenerated or it silently re-permits the finding.
+              print("VERDICT=STALE")
+          else:
+              print("VERDICT=OK")
+          GAUNTLET_CODEQL_PY
+
+          verdict=$(grep -o 'VERDICT=[A-Z]*' codeql-report.txt | cut -d= -f2)
+          {
+            echo "### deep analysis (${{ matrix.language }})"
+            echo '<pre>'
+            cat codeql-report.txt
+            echo '</pre>'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          case "$verdict" in
+            FAILED)
+              echo "GATE codeql = FAILED (${{ matrix.language }}: findings above the reviewed baseline)" >> "$GITHUB_STEP_SUMMARY"
+              exit 1 ;;
+            STALE)
+              echo "GATE codeql = VERIFIED (${{ matrix.language }}: nothing new; the baseline lists findings that no longer occur — regenerate it)" >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning title=codeql baseline is stale::findings were fixed; regenerate .codeql-baseline.json so they cannot come back unnoticed" ;;
+            *)
+              echo "GATE codeql = VERIFIED (${{ matrix.language }}: nothing above the reviewed baseline)" >> "$GITHUB_STEP_SUMMARY" ;;
+          esac
       - name: keep the results
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

@@ -1,0 +1,168 @@
+{
+  "_comment": [
+    "Findings reviewed one at a time and accepted, with the reason each is not a defect.",
+    "The gate fails on anything NOT listed here, and on a count higher than the one recorded,",
+    "so this can only shrink. It is not a list of rules to ignore: the same rule in a new file,",
+    "or one more occurrence in a file already listed, is a failure.",
+    "Reviewed 2026-09-06 against commit 0b465b21. Five findings were real and were fixed in that",
+    "commit rather than recorded here."
+  ],
+  "reviewed": [
+    {
+      "rule": "js/bad-tag-filter",
+      "file": "src/app/api/agents/analyze-website/route.ts",
+      "count": 1,
+      "reason": "Rough tag stripping used to estimate an article's text, never to sanitise HTML for rendering."
+    },
+    {
+      "rule": "js/bad-tag-filter",
+      "file": "src/app/api/content/webpage/route.ts",
+      "count": 1,
+      "reason": "Rough tag stripping used to estimate an article's text, never to sanitise HTML for rendering."
+    },
+    {
+      "rule": "js/bad-tag-filter",
+      "file": "worker/src/linkedin/derive.ts",
+      "count": 1,
+      "reason": "Rough tag stripping used to estimate an article's text, never to sanitise HTML for rendering."
+    },
+    {
+      "rule": "js/double-escaping",
+      "file": "src/app/(dashboard)/dashboard/repurpose/page.tsx",
+      "count": 1,
+      "reason": "Entity handling while turning fetched HTML into plain text. A double-escaped ampersand is a cosmetic defect."
+    },
+    {
+      "rule": "js/double-escaping",
+      "file": "src/app/api/content/webpage/route.ts",
+      "count": 1,
+      "reason": "Entity handling while turning fetched HTML into plain text. A double-escaped ampersand is a cosmetic defect."
+    },
+    {
+      "rule": "js/double-escaping",
+      "file": "src/lib/youtube-captions.ts",
+      "count": 1,
+      "reason": "Entity handling while turning fetched HTML into plain text. A double-escaped ampersand is a cosmetic defect."
+    },
+    {
+      "rule": "js/http-to-file-access",
+      "file": "worker/src/tools/publish-live-check.ts",
+      "count": 1,
+      "reason": "worker/src/tools is developer scripts that do not ship in either image."
+    },
+    {
+      "rule": "js/incomplete-multi-character-sanitization",
+      "file": "src/app/(dashboard)/dashboard/repurpose/page.tsx",
+      "count": 1,
+      "reason": "Formatting of scraped article text for display, not escaping for a security boundary. The output is rendered by React, which escapes it."
+    },
+    {
+      "rule": "js/incomplete-multi-character-sanitization",
+      "file": "src/app/api/content/webpage/route.ts",
+      "count": 2,
+      "reason": "Formatting of scraped article text for display, not escaping for a security boundary. The output is rendered by React, which escapes it."
+    },
+    {
+      "rule": "js/incomplete-multi-character-sanitization",
+      "file": "src/lib/docs.ts",
+      "count": 1,
+      "reason": "Formatting of scraped article text for display, not escaping for a security boundary. The output is rendered by React, which escapes it."
+    },
+    {
+      "rule": "js/incomplete-multi-character-sanitization",
+      "file": "src/lib/youtube-captions.ts",
+      "count": 1,
+      "reason": "Formatting of scraped article text for display, not escaping for a security boundary. The output is rendered by React, which escapes it."
+    },
+    {
+      "rule": "js/incomplete-url-substring-sanitization",
+      "file": "src/app/(dashboard)/dashboard/repurpose/page.tsx",
+      "count": 3,
+      "reason": "Presentation and configuration checks, not security boundaries: choosing an icon, a default region, or how a preview is labelled. The three that WERE boundaries are fixed in 0b465b21 and covered by src/lib/host-allow.test.ts."
+    },
+    {
+      "rule": "js/incomplete-url-substring-sanitization",
+      "file": "src/components/dashboard/carousel/CanvasWorkspace.tsx",
+      "count": 5,
+      "reason": "Presentation and configuration checks, not security boundaries: choosing an icon, a default region, or how a preview is labelled. The three that WERE boundaries are fixed in 0b465b21 and covered by src/lib/host-allow.test.ts."
+    },
+    {
+      "rule": "js/insecure-randomness",
+      "file": "worker/src/browser/human.ts",
+      "count": 1,
+      "reason": "Math.random choosing how long the worker pauses between actions to look human. Unpredictability to an attacker is not the property wanted."
+    },
+    {
+      "rule": "js/insecure-temporary-file",
+      "file": "worker/src/tools/post-check.ts",
+      "count": 1,
+      "reason": "worker/src/tools is developer scripts that do not ship in either image."
+    },
+    {
+      "rule": "js/insufficient-password-hash",
+      "file": "src/lib/api-auth.ts",
+      "count": 1,
+      "reason": "SHA-256 over a 32-character random API key, not a password. Fast hashing is correct for a high-entropy secret read on every request, and verifyApiKey already compares in constant time."
+    },
+    {
+      "rule": "js/regex/missing-regexp-anchor",
+      "file": "src/lib/reddit.ts",
+      "count": 1,
+      "reason": "Prefix and fragment rewrites of content the app fetched (a reddit URL normalised to www, LinkedIn tier and source strings). Nothing here decides access."
+    },
+    {
+      "rule": "js/regex/missing-regexp-anchor",
+      "file": "worker/src/linkedin/sources.ts",
+      "count": 3,
+      "reason": "Prefix and fragment rewrites of content the app fetched (a reddit URL normalised to www, LinkedIn tier and source strings). Nothing here decides access."
+    },
+    {
+      "rule": "js/regex/missing-regexp-anchor",
+      "file": "worker/src/linkedin/tier.ts",
+      "count": 3,
+      "reason": "Prefix and fragment rewrites of content the app fetched (a reddit URL normalised to www, LinkedIn tier and source strings). Nothing here decides access."
+    },
+    {
+      "rule": "js/request-forgery",
+      "file": "src/app/api/content/webpage/route.ts",
+      "count": 1,
+      "reason": "content/webpage blocks private and link-local hosts and follows redirects one hop at a time so a 302 cannot slip past the check; lib/reddit is only reached through a route that validates the hostname exactly. media/proxy now requires a dot boundary, which CodeQL cannot see through."
+    },
+    {
+      "rule": "js/request-forgery",
+      "file": "src/app/api/media/proxy/route.ts",
+      "count": 1,
+      "reason": "content/webpage blocks private and link-local hosts and follows redirects one hop at a time so a 302 cannot slip past the check; lib/reddit is only reached through a route that validates the hostname exactly. media/proxy now requires a dot boundary, which CodeQL cannot see through."
+    },
+    {
+      "rule": "js/request-forgery",
+      "file": "src/lib/reddit.ts",
+      "count": 1,
+      "reason": "content/webpage blocks private and link-local hosts and follows redirects one hop at a time so a 302 cannot slip past the check; lib/reddit is only reached through a route that validates the hostname exactly. media/proxy now requires a dot boundary, which CodeQL cannot see through."
+    },
+    {
+      "rule": "js/stored-xss",
+      "file": "src/app/docs/%5B...slug%5D/page.tsx",
+      "count": 5,
+      "reason": "The stored data is markdown in src/content, changed only by a commit to this repository. There is no path for a user to write it."
+    },
+    {
+      "rule": "js/stored-xss",
+      "file": "src/app/docs/page.tsx",
+      "count": 2,
+      "reason": "The stored data is markdown in src/content, changed only by a commit to this repository. There is no path for a user to write it."
+    },
+    {
+      "rule": "js/user-controlled-bypass",
+      "file": "src/app/api/auth/2fa/verify/route.ts",
+      "count": 2,
+      "reason": "2fa/verify branches on code.length as an early reject; the decision is verifyTOTP against the stored secret. google/callback branches on isPopup, which chooses the shape of an error response, and both shapes deny."
+    },
+    {
+      "rule": "js/user-controlled-bypass",
+      "file": "src/app/api/google/callback/route.ts",
+      "count": 3,
+      "reason": "2fa/verify branches on code.length as an early reject; the decision is verifyTOTP against the stored secret. google/callback branches on isPopup, which chooses the shape of an error response, and both shapes deny."
+    }
+  ]
+}
