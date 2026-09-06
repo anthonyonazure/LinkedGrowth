@@ -49,6 +49,15 @@ export default defineConfig({
       TURSO_DATABASE_URL: "file:/tmp/lg-wizard.db",
       STORAGE_ROOT: "/tmp/lg-wizard-uploads",
       LINKEDGROW_EDITION: "self-hosted",
+      // Throwaway values for a throwaway instance, the same way
+      // playwright.countries.config.ts does it. Without them NextAuth has no
+      // secret, every sign in redirects to ?error=Configuration, and the run
+      // fails on the setup page assertion — which reads as the wizard being
+      // broken rather than the run being unconfigured. Requiring a developer's
+      // own .env.local is what made this spec unrunnable in CI.
+      AUTH_SECRET: "wizard-probe-auth-secret-not-a-real-one",
+      AUTH_TRUST_HOST: "true",
+      ENCRYPTION_KEY: "0".repeat(64),
     },
   },
 });
