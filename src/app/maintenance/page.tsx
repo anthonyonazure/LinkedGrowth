@@ -77,8 +77,8 @@ export default function MaintenancePage() {
         {isCloud() ? (
           <p className="mt-6 text-sm text-muted-foreground">
             Questions? Contact us at{" "}
-            <a href="mailto:contact@linkedgrow.ai" className="text-linkedin hover:underline">
-              contact@linkedgrow.ai
+            <a href="mailto:anthony@tilmsp.com" className="text-linkedin hover:underline">
+              anthony@tilmsp.com
             </a>
           </p>
         ) : (

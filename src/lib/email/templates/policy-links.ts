@@ -14,9 +14,9 @@ export function policyLinksHtml(): string {
                                                 <tr>
                                                     <td align="center">
                                                         <p style="font-family: 'Inter', sans-serif; color: #45556C; font-size: 14px; line-height: 150%; margin-bottom: 0;">
-                                                            <a href="https://linkedgrow.ai/privacy" style="color: #45556C; text-decoration: underline;">Privacy Policy</a>
+                                                            <a href="https://tilmsp.com/privacy" style="color: #45556C; text-decoration: underline;">Privacy Policy</a>
                                                             <span style="color: #45556C;"> | </span>
-                                                            <a href="https://linkedgrow.ai/cookies" style="color: #45556C; text-decoration: underline;">Cookie Policy</a>
+                                                            <a href="https://tilmsp.com/cookies" style="color: #45556C; text-decoration: underline;">Cookie Policy</a>
                                                         </p>
                                                     </td>
                                                 </tr>`;
@@ -24,6 +24,6 @@ export function policyLinksHtml(): string {
 
 export function policyLinksText(): string {
   if (!isCloud()) return "";
-  return `Privacy Policy: https://linkedgrow.ai/privacy
-Cookie Policy: https://linkedgrow.ai/cookies`;
+  return `Privacy Policy: https://tilmsp.com/privacy
+Cookie Policy: https://tilmsp.com/cookies`;
 }

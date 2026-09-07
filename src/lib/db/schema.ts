@@ -1721,3 +1721,34 @@ export const instanceSettings = sqliteTable("instance_settings", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
+
+/**
+ * The analytics this instance keeps about itself.
+ *
+ * The upstream tracker posted to a third party and sent the full URL and query
+ * string with every event. On a tool whose URLs carry agent and lead
+ * identifiers that is a leak wearing an analytics badge, so the collector
+ * stores the path only and drops the rest before it ever reaches a row. There
+ * is no ip or user agent column: the tracker sends neither, and an empty
+ * column is an invitation to start filling it.
+ */
+export const insightEvents = sqliteTable("insight_events", {
+  id: text("id").primaryKey(),
+  site: text("site").notNull(),
+  type: text("type").notNull(),
+  visitorId: text("visitor_id"),
+  path: text("path").notNull(),
+  referrer: text("referrer"),
+  lang: text("lang"),
+  screenWidth: integer("screen_width"),
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  durationMs: integer("duration_ms"),
+  goal: text("goal"),
+  clickTarget: text("click_target"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+}, (t) => [
+  index("insight_events_created_at").on(t.createdAt),
+  index("insight_events_site_type").on(t.site, t.type),
+]);

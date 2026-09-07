@@ -37,6 +37,8 @@ const PUBLIC_ROUTES: Record<string, string> = {
   "google/callback/route.ts": "Google returns here, still signed out",
   "google/2fa/route.ts": "second factor, gated by a signed challenge cookie",
   "team/invite/validate/route.ts": "an invited person reads their invitation before they have an account",
+  "insight/collect/route.ts":
+    "a browser beacon, sent while the page is being torn down, so there is no session to present. It accepts only its own event shape, caps the body before parsing it, drops every field it does not recognise, and is rate limited by address",
 };
 
 /** Any of these means the route established who is calling. */

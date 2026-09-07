@@ -47,7 +47,7 @@ async function resolveTransport(): Promise<Transport> {
   if (isCloud()) {
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) throw new Error("BREVO_API_KEY is not configured");
-    const address = process.env.FROM_EMAIL || "noreply@linkedgrow.ai";
+    const address = process.env.FROM_EMAIL || "noreply@tilmsp.com";
     return { kind: "brevo", apiKey, from: { name: "LinkedGrow", address } };
   }
 
@@ -100,7 +100,7 @@ export async function sendEmail({ to, subject, html, text, replyTo }: SendEmailP
 
 /** Where operations mail goes: us in the cloud, the instance admin at home. Empty means nobody. */
 export async function opsRecipient(): Promise<string> {
-  if (isCloud()) return "contact@linkedgrow.ai";
+  if (isCloud()) return "anthony@tilmsp.com";
   const settings = await getInstanceSettings();
   return settings.adminEmail || settings.emailFromAddress || "";
 }

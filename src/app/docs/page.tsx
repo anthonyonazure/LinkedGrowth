@@ -158,7 +158,7 @@ export default async function DocsPage() {
               <b>Can&apos;t find what you&apos;re looking for?</b>
               <p>{isCloud() ? "Our team is here to help. Reach out and we'll get back to you quickly." : "Open an issue on GitHub and describe what you were trying to do."}</p>
               {isCloud() ? (
-                <a className={FILL_SM} href="mailto:contact@linkedgrow.ai">
+                <a className={FILL_SM} href="mailto:anthony@tilmsp.com">
                   Contact support
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
                 </a>

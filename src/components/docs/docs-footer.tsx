@@ -25,7 +25,7 @@ export function DocsFooter() {
           <div className="text-sm text-slate-500 dark:text-slate-400">
             Need help?{" "}
             {isCloud() ? (
-              <a href="mailto:contact@linkedgrow.ai" className="text-cyan-600 dark:text-cyan-400 hover:underline">
+              <a href="mailto:anthony@tilmsp.com" className="text-cyan-600 dark:text-cyan-400 hover:underline">
                 Contact support
               </a>
             ) : (

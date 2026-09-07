@@ -268,7 +268,7 @@ export function Sidebar() {
       <div className="space-y-1">
         {helpLink("/docs", "Docs", BookIcon)}
         {isCloud()
-          ? helpLink("mailto:contact@linkedgrow.ai", "Contact support", ChatIcon)
+          ? helpLink("mailto:anthony@tilmsp.com", "Contact support", ChatIcon)
           : helpLink("https://github.com/DigiHold/LinkedGrow/issues", "Report an issue", ChatIcon, true)}
       </div>
     </div>

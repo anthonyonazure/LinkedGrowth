@@ -139,12 +139,24 @@ export default async function RootLayout({
             `,
           }}
         />
-        {/* The marketing schema describes the cloud company and product, and
-            the analytics script reports to the cloud's own instance. A self
-            hosted instance sends nothing anywhere. */}
+        {/* Analytics, off unless this instance is told to keep them, and
+            first-party either way.
+     
+            What was here loaded a tracker from a third party's domain and
+            posted every page view to them, including the absolute URL and the
+            query string. This app's URLs carry agent and lead identifiers, so
+            that was a leak wearing an analytics badge. The replacement is
+            served from this instance, posts to this instance, stores the path
+            only, and is read back at /insight.
+     
+            Opt-in rather than on: a self hosted instance that starts recording
+            its user without being asked has made that decision for every other
+            person who installs it. */}
+        {process.env.INSIGHT_ENABLED === "true" && (
+          <script defer data-site="linkedgrow" src="/insight/t.js" />
+        )}
         {isCloud() && (
           <>
-            <script defer data-site="linkedgrow" data-persist="true" src="https://insight.nicolaslecocq.com/t.js" />
             <OrganizationJsonLd />
             <WebsiteJsonLd />
             <SoftwareApplicationJsonLd />

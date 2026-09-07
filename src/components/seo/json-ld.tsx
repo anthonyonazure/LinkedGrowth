@@ -52,7 +52,7 @@ export function OrganizationJsonLd() {
     },
     contactPoint: {
       "@type": "ContactPoint",
-      email: "contact@linkedgrow.ai",
+      email: "anthony@tilmsp.com",
       contactType: "customer support",
     },
     sameAs: [

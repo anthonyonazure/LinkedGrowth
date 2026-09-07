@@ -74,7 +74,7 @@ docker compose exec app npm run db:clear-2fa -- you@example.com
 
 The command names the address it cleared, and it stops with a message when no account on that instance uses the address. Every session opened before it runs is signed out, so another browser that was still signed in has to sign in again.
 
-On the hosted service at linkedgrow.ai, write to contact@linkedgrow.ai from the address on the account and we run the same command for you.
+On the hosted service at linkedgrow.ai, write to anthony@tilmsp.com from the address on the account and we run the same command for you.
 
 Once you are back in, set 2FA up again straight away with your new device or app. The old secret is gone and the old QR code no longer works, so go to **Settings** and enable it again with a new one.
 

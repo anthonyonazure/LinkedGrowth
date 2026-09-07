@@ -22,8 +22,8 @@ export async function notifyOps(subject: string, lines: string[]): Promise<void>
         method: "POST",
         headers: { "api-key": brevo, "Content-Type": "application/json" },
         body: JSON.stringify({
-          sender: { name: "LinkedGrow worker", email: "contact@linkedgrow.ai" },
-          to: [{ email: "contact@linkedgrow.ai" }],
+          sender: { name: "LinkedGrow worker", email: "noreply@tilmsp.com" },
+          to: [{ email: "anthony@tilmsp.com" }],
           subject,
           htmlContent: `<p>${lines.join("</p><p>")}</p>`,
         }),

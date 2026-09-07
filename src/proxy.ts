@@ -170,6 +170,10 @@ const authProxy = auth(async (req) => {
       "/api/internal/",
       // Liveness for the compose healthcheck and the boot wait of the worker.
       "/api/health",
+      // A browser beacon fires while the page is being torn down, so there is
+      // no session to present. The route accepts nothing but its own event
+      // shape, is capped and rate limited, and writes to this instance only.
+      "/api/insight/collect",
     ];
     const isPublic = publicApiPrefixes.some((p) => nextUrl.pathname.startsWith(p));
     if (!isPublic) {
