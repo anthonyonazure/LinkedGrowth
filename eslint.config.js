@@ -8,7 +8,10 @@ export default tseslint.config(
   // .stryker-tmp holds instrumented copies of every source file, which lint
   // has plenty to say about — a lint gate red because a mutation run was
   // interrupted is red for a reason that is not a defect.
-  { ignores: ["**/.next/**", "**/dist/**", "**/build/**", "**/node_modules/**", "**/.stryker-tmp/**", "**/*.cjs"] },
+  // public/ is served verbatim to browsers; it is not part of any tsconfig and
+  // is not TypeScript. Linting it with type information reports a parse error,
+  // which reads exactly like a real finding.
+  { ignores: ["**/public/**", "**/.next/**", "**/dist/**", "**/build/**", "**/node_modules/**", "**/.stryker-tmp/**", "**/*.cjs"] },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {

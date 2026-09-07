@@ -54,7 +54,7 @@ function count(value: unknown, max: number): number | null {
 function pathOnly(value: unknown): string | null {
   const raw = text(value, 2048);
   if (!raw) return null;
-  const withoutQuery = raw.split("?")[0]!.split("#")[0]!;
+  const withoutQuery = raw.split("?")[0].split("#")[0];
   if (!withoutQuery.startsWith("/")) return null;
   return withoutQuery.slice(0, 512);
 }
