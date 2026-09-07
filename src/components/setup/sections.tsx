@@ -300,10 +300,16 @@ export function ProxyFields({
   onTest: () => void;
 }) {
   return (
-    <Tabs value={form.provider === "proxy-seller" ? "buy" : "own"} onValueChange={(v) => onChange({ provider: v === "buy" ? "proxy-seller" : "none" })}>
-      <TabsList className="grid h-auto w-full grid-cols-2">
+    <Tabs
+      value={form.directEgress ? "direct" : form.provider === "proxy-seller" ? "buy" : "own"}
+      onValueChange={(v) =>
+        onChange({ provider: v === "buy" ? "proxy-seller" : "none", directEgress: v === "direct" })
+      }
+    >
+      <TabsList className="grid h-auto w-full grid-cols-3">
         <TabsTrigger value="buy">Buy through Proxy-Seller</TabsTrigger>
         <TabsTrigger value="own">I bring my own proxy</TabsTrigger>
+        <TabsTrigger value="direct">Use this server&apos;s connection</TabsTrigger>
       </TabsList>
       <TabsContent value="buy" className="mt-6 space-y-6">
         <Field label="Proxy-Seller API key" hint="Create an account at proxy-seller.com, add credit, then copy the API key from the account page." htmlFor="proxySellerKey">
@@ -341,6 +347,31 @@ export function ProxyFields({
         <p className="text-sm text-slate-500 dark:text-slate-400">
           Leave the key empty. When you connect a LinkedIn account, an advanced panel takes the host, port, username and password of a proxy you own. The reputation of that address is yours, and LinkedGrow never renews it.
         </p>
+      </TabsContent>
+      <TabsContent value="direct" className="mt-6 space-y-6">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Every account acts from the connection this server already has, and no account waits for an address. This is the right answer when you run LinkedGrow at home or in an office, on the same connection you browse LinkedIn from yourself.
+        </p>
+        <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/40">
+          <p className="text-sm text-amber-900 dark:text-amber-200">
+            Wrong on a rented server. A datacentre address is the fastest way to have an account challenged or restricted, and every account on this instance would share the one address. Test below and read what it says before you leave this on.
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-muted/40 p-4">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            This server&apos;s public address:{" "}
+            <span className="font-mono text-slate-900 dark:text-white" data-testid="direct-server-ip">
+              {serverIp ?? "?"}
+            </span>
+          </p>
+        </div>
+        <TestRow
+          label="Check what LinkedIn sees"
+          hint="We read this server's own address and say whether it looks like a home connection or a datacentre."
+          outcome={outcome}
+          onTest={onTest}
+          testId="direct-test-result"
+        />
       </TabsContent>
     </Tabs>
   );

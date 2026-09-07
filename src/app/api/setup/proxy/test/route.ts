@@ -1,11 +1,20 @@
-/** Asks Proxy-Seller which countries it sells addresses in, which also proves the allowlist lets this server through. */
+/**
+ * Two tests behind one route.
+ *
+ * With a supplier, it asks Proxy-Seller which countries it sells addresses in,
+ * which also proves the allowlist lets this server through. With the instance
+ * sending from its own connection, it reads that connection the way LinkedIn
+ * will read it and says so, because the switch is only safe on a network that
+ * does not look like a datacentre.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isSelfHosted } from "@/lib/edition";
 import { instanceSecrets } from "@/lib/instance-settings";
+import { checkDirectExit, describeDirectExit } from "@/lib/proxy/exit-check";
 import { ProxySellerProvider } from "@/lib/proxy/proxy-seller";
 import { rateLimit, AUTH_RATE_LIMITS } from "@/lib/rate-limit";
-import { secret, ValidationError } from "@/lib/setup/fields";
+import { boolean, secret, ValidationError } from "@/lib/setup/fields";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +32,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+
+    if (boolean(body.directEgress, "Use this server's connection")) {
+      const said = describeDirectExit(await checkDirectExit());
+      return NextResponse.json(said.ok ? { ok: true, detail: said.detail } : { ok: false, error: said.detail });
+    }
+
     const pasted = secret(body.apiKey, "Proxy-Seller API key");
     const apiKey = pasted || (await instanceSecrets()).proxySellerKey;
     if (!apiKey) return NextResponse.json({ ok: false, error: "Paste the Proxy-Seller API key first." });

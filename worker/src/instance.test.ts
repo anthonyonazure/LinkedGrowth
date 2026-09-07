@@ -27,7 +27,7 @@ async function freshTable(): Promise<void> {
     timezone TEXT, admin_email TEXT, app_url TEXT,
     agent_ai_provider TEXT, agent_ai_key_encrypted TEXT, agent_ai_model_fast TEXT, agent_ai_model_writer TEXT,
     agent_daily_cap_usd REAL NOT NULL DEFAULT 1.0, account_monthly_cap_usd REAL NOT NULL DEFAULT 12.0,
-    proxy_seller_key_encrypted TEXT, cron_secret_encrypted TEXT,
+    proxy_seller_key_encrypted TEXT, direct_egress INTEGER NOT NULL DEFAULT 0, cron_secret_encrypted TEXT,
     storage_provider TEXT NOT NULL DEFAULT 'local', s3_endpoint TEXT, s3_region TEXT, s3_bucket TEXT,
     s3_access_key_encrypted TEXT, s3_secret_encrypted TEXT, s3_public_url TEXT)`);
 }
@@ -56,6 +56,7 @@ test("self hosted: the wizard's row comes back decrypted, with its caps and its 
   assert.equal(i.agentDailyCapUsd, 2.5);
   assert.equal(i.accountMonthlyCapUsd, 40);
   assert.equal(i.proxySellerKey, "proxy-seller-key");
+  assert.equal(i.directEgress, false, "an address is required unless the operator says otherwise");
   assert.equal(i.cronSecret, "cron-secret");
   assert.equal(i.adminEmail, "admin@acme.test");
   assert.equal(i.appUrl, "https://leads.acme.test");
@@ -123,4 +124,18 @@ test("cloud: the environment answers and the database is never opened", async ()
   assert.equal(bare.proxySellerKey, null);
   assert.equal(bare.appUrl, null);
   setDbForTests(null);
+});
+
+test("self hosted: the operator can say the server's own connection is the address", async () => {
+  await freshTable();
+  await seedRow();
+  await sharedDb().execute("UPDATE instance_settings SET direct_egress = 1 WHERE id = 1");
+  invalidateInstance();
+  const i = await instanceFor("self-hosted", {});
+  assert.equal(i.directEgress, true);
+});
+
+test("cloud: one shared address for every customer is never allowed", async () => {
+  const i = await instanceFor("cloud", { PROXY_SELLER_API_KEY: "k" });
+  assert.equal(i.directEgress, false);
 });

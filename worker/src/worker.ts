@@ -17,7 +17,7 @@ import { NoSlotError, reportSlots, takeSlot } from "./safety/slots.ts";
 import { currentRun } from "./safety/run-context.ts";
 import { RunStalled, withWatchdog } from "./safety/watchdog.ts";
 import { reapLeakedChromes } from "./safety/reaper.ts";
-import { allocationFor, isProduction } from "./proxy/allocation.ts";
+import { allocationFor, requiresAllocation } from "./proxy/allocation.ts";
 import { fulfilPendingAllocations } from "./proxy/fulfil.ts";
 import { connectPass } from "./linkedin/connect-pass.ts";
 import { publishPass } from "./publish/pass.ts";
@@ -138,7 +138,7 @@ async function runAgent(ctx: AgentContext): Promise<void> {
   }
 
   const proxy = await allocationFor(ctx.linkedinAccountId);
-  if (!proxy && isProduction()) {
+  if (!proxy && (await requiresAllocation())) {
     // Never in production. An account sending from the server's own address is
     // an account seen from a datacentre, which is the fastest way to lose it.
     await pauseAgent(ctx, "No dedicated address is allocated to this account yet.");

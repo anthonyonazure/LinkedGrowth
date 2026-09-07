@@ -30,7 +30,7 @@ for (const file of SESSION_OPENERS) {
     assert.match(src, /allocationFor\(/, "the address is never looked up");
     assert.match(
       src,
-      /isProduction\(\)/,
+      /requiresAllocation\(\)/,
       "nothing stops this running from the server's own address in production"
     );
     // The allocation has to reach openSession, not just be fetched and dropped.

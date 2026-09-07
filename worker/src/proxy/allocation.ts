@@ -1,5 +1,6 @@
 import { db } from "../db.ts";
 import { decryptSecret } from "../crypto.ts";
+import { instance } from "../instance.ts";
 import { log } from "../logger.ts";
 import type { ProxyAllocation } from "../browser/driver.ts";
 
@@ -14,7 +15,8 @@ import type { ProxyAllocation } from "../browser/driver.ts";
  *
  * A missing or inactive row is not an error to route around. In production the
  * work is refused, because an account acting from the server's own address is
- * an account seen from a datacentre.
+ * an account seen from a datacentre. The one exception is an instance whose
+ * operator turned that address into the point: see requiresAllocation.
  */
 export async function allocationFor(
   linkedinAccountId: string
@@ -49,4 +51,23 @@ export async function allocationFor(
 
 export function isProduction(): boolean {
   return process.env.WORKER_ENV === "production";
+}
+
+/**
+ * Must this account have an address of its own before anything runs?
+ *
+ * Yes in production, which is the rule the four passes were written around. No
+ * when the operator of a self hosted instance has said the server is already
+ * sitting where the accounts should be seen from, which is true of a machine at
+ * home or in an office and false of a rented one. The reasoning that refuses a
+ * datacentre address has not changed; this only recognises that on somebody's
+ * own connection there is no datacentre to hide from, and buying an address
+ * would replace a real residential exit with a rented one.
+ *
+ * One helper rather than a copy of the check per pass, so the switch cannot be
+ * honoured in three places and forgotten in the fourth.
+ */
+export async function requiresAllocation(): Promise<boolean> {
+  if (!isProduction()) return false;
+  return !(await instance()).directEgress;
 }

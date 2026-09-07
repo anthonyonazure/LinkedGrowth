@@ -19,8 +19,8 @@ export const COPY = {
   proxy: {
     heading: "One address per LinkedIn account",
     intro:
-      "LinkedIn compares where an account signs in from with where it always has. Each account you connect gets its own residential or ISP address in its own country, and it keeps that address for good. You can buy addresses through Proxy-Seller with your own account, or bring a proxy you already own.",
-    skip: "You can skip this step, but no agent will start until an address exists. The key can be added later in Settings, Instance.",
+      "LinkedIn compares where an account signs in from with where it always has. Each account you connect gets its own residential or ISP address in its own country, and it keeps that address for good. You can buy addresses through Proxy-Seller with your own account, bring a proxy you already own, or send from the connection this server is already on.",
+    skip: "You can skip this step, but no agent will start until an address exists, unless you choose to send from this server's connection. Anything here can be changed later in Settings, Instance.",
   },
   email: {
     heading: "Email, for notifications only",

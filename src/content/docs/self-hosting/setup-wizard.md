@@ -23,6 +23,8 @@ LinkedIn compares where an account signs in from with where it always has, so ea
 
 To bring your own proxy, leave the key empty: an advanced panel takes the host, port, username and password when you connect an account, and LinkedGrow never renews that address. You can skip the step, but no agent starts until an address exists.
 
+The third choice sends from the connection this server already has, and no account waits for an address. It suits an instance running at home or in an office, on the same connection you browse LinkedIn from yourself. It is the wrong choice on a rented server: a datacentre address is the fastest way to have an account challenged, and every account on the instance shares the one address. The test on that tab reads this server's own address and says whether it looks like a consumer ISP or a hosting network, which is the answer to read before leaving the choice in place.
+
 ## Email
 
 LinkedGrow emails you when a lead replies, when LinkedIn asks for a verification code, when an agent stops, and once a week with the people it found. Resend needs an API key with a verified sending domain; SMTP takes a host, port, username, password and a TLS switch. The from address must belong to a domain your provider may send from, and the test sends one message to the admin address. Skip it and everything still shows in the dashboard.

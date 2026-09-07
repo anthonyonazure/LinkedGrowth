@@ -1,7 +1,7 @@
 import { log, logError } from "../logger.ts";
 import { closeSession, isSignedIn, openSession, ProxyMismatchError } from "../browser/driver.ts";
 import type { Session } from "../browser/driver.ts";
-import { allocationFor, isProduction } from "../proxy/allocation.ts";
+import { allocationFor, requiresAllocation } from "../proxy/allocation.ts";
 import { NoSlotError, takeSlot } from "../safety/slots.ts";
 import { withWatchdog, RunStalled } from "../safety/watchdog.ts";
 import { currentRun } from "../safety/run-context.ts";
@@ -468,7 +468,7 @@ export async function publishPass(): Promise<void> {
       // one waits rather than publishing from the server's own IP, and a post
       // that waits must not have spent an attempt doing it.
       const address = await allocationFor(work.account.id);
-      if (!address && isProduction()) {
+      if (!address && (await requiresAllocation())) {
         log("publish deferred: no address allocated yet", { accountId: work.account.id });
         return;
       }

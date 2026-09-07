@@ -1701,6 +1701,8 @@ export const instanceSettings = sqliteTable("instance_settings", {
   accountMonthlyCapUsd: real("account_monthly_cap_usd").notNull().default(12.0),
   proxyProvider: text("proxy_provider", { enum: ["none", "proxy-seller"] }).notNull().default("none"),
   proxySellerKeyEncrypted: text("proxy_seller_key_encrypted"),
+  /** The whole instance acts from the connection this server already has, and no account needs an address of its own. */
+  directEgress: integer("direct_egress", { mode: "boolean" }).notNull().default(false),
   emailProvider: text("email_provider", { enum: ["none", "resend", "smtp", "brevo"] }).notNull().default("none"),
   emailKeyEncrypted: text("email_key_encrypted"),
   smtpHost: text("smtp_host"),

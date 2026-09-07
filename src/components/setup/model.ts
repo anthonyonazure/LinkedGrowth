@@ -39,6 +39,8 @@ export type ProxyProviderId = ProxySection["provider"];
 export interface ProxyForm {
   provider: ProxyProviderId;
   apiKey: string;
+  /** Every account acts from this server's own connection; no address is bought or brought. */
+  directEgress: boolean;
 }
 
 export type EmailProviderId = EmailSection["provider"];
@@ -115,7 +117,7 @@ export function formsFrom(status: SetupStatus, defaults: { adminEmail: string })
       dailyCapUsd: String(status.ai.dailyCapUsd),
       monthlyCapUsd: String(status.ai.monthlyCapUsd),
     },
-    proxy: { provider: status.proxy.provider, apiKey: "" },
+    proxy: { provider: status.proxy.provider, apiKey: "", directEgress: status.proxy.directEgress },
     email: {
       provider: status.email.provider,
       apiKey: "",
@@ -161,8 +163,14 @@ export function bodyFor(area: Area, forms: Forms): Record<string, unknown> {
     }
     case "proxy": {
       const f = forms.proxy;
-      // Bringing your own proxy means no supplier key: the choice clears it.
-      return { provider: f.provider, ...(f.provider === "none" ? { apiKey: "" } : withSecret("apiKey", f.apiKey)) };
+      // Bringing your own proxy means no supplier key, and so does sending from
+      // this server: either choice clears it.
+      const provider = f.directEgress ? "none" : f.provider;
+      return {
+        provider,
+        directEgress: f.directEgress,
+        ...(provider === "none" ? { apiKey: "" } : withSecret("apiKey", f.apiKey)),
+      };
     }
     case "email": {
       const f = forms.email;
@@ -273,6 +281,7 @@ export function applyPatch(status: SetupStatus, patch: SectionPatch): SetupStatu
 interface TestResponse {
   ok: boolean;
   sample?: string;
+  detail?: string;
   countries?: number;
   to?: string;
   url?: string;
@@ -295,13 +304,16 @@ export async function testArea(area: TestArea, forms: Forms): Promise<{ outcome:
     area === "ai"
       ? { provider: forms.ai.provider, ...withSecret("apiKey", forms.ai.apiKey), ...(forms.ai.modelFast ? { model: forms.ai.modelFast } : {}) }
       : area === "proxy"
-        ? { ...withSecret("apiKey", forms.proxy.apiKey) }
+        ? forms.proxy.directEgress
+          ? { directEgress: true }
+          : { ...withSecret("apiKey", forms.proxy.apiKey) }
         : {};
   const result = await request<TestResponse>(`/api/setup/${area}/test`, "POST", body);
   if (!result.ok) return { outcome: { state: "error", detail: result.error }, patch };
   const d = result.data;
   if (!d.ok) return { outcome: { state: "error", detail: d.error ?? "The test failed." }, patch };
-  const detail = d.sample ?? (d.countries !== undefined ? `${d.countries} countries` : undefined) ?? d.to ?? d.url ?? "ok";
+  const detail =
+    d.sample ?? d.detail ?? (d.countries !== undefined ? `${d.countries} countries` : undefined) ?? d.to ?? d.url ?? "ok";
   return { outcome: { state: "ok", detail }, patch };
 }
 
@@ -313,7 +325,14 @@ export function summary(status: SetupStatus): { label: string; value: string }[]
   return [
     { label: "Instance", value: [status.instance.instanceName, status.instance.appUrl, status.instance.timezone].filter(Boolean).join(", ") },
     { label: "AI provider and models", value: `${providerLabel}: ${models}` },
-    { label: "Dedicated IP", value: status.proxy.provider === "proxy-seller" ? "Proxy-Seller" : "My own proxy" },
+    {
+      label: "Dedicated IP",
+      value: status.proxy.directEgress
+        ? `This server's own connection${status.proxy.serverIp ? `, ${status.proxy.serverIp}` : ""}`
+        : status.proxy.provider === "proxy-seller"
+          ? "Proxy-Seller"
+          : "My own proxy",
+    },
     { label: "Email", value: status.email.provider === "none" ? emailLabel : `${emailLabel}, ${status.email.fromAddress ?? "?"}` },
     { label: "Storage", value: status.storage.provider === "s3" ? `S3 compatible, ${status.storage.s3Bucket ?? "?"}` : "Local disk" },
   ];

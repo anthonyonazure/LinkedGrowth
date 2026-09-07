@@ -120,6 +120,76 @@ export async function checkExit(
 }
 
 /**
+ * The same reading of this server's own connection, with no proxy in front.
+ *
+ * The instance setting that turns addresses off is only safe when the server
+ * is already sitting on a consumer connection, so the switch has to be able to
+ * show what LinkedIn would see rather than take the operator's word for it. A
+ * hosting classification here is the whole reason the warning exists.
+ */
+export async function checkDirectExit(timeoutMs = 10_000): Promise<ExitCheck> {
+  const empty: ExitCheck = {
+    ip: "",
+    asn: null,
+    asnOrg: null,
+    country: null,
+    looksHosted: false,
+  };
+
+  try {
+    const response = await fetch("https://ipinfo.io/json", {
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if (!response.ok) {
+      return { ...empty, error: `lookup returned HTTP ${response.status}` };
+    }
+    const data = (await response.json()) as {
+      ip?: string;
+      org?: string;
+      country?: string;
+    };
+    const org = data.org ?? null;
+    const match = org?.match(/^(AS\d+)\s+(.*)$/);
+    const asn = match?.[1] ?? null;
+    const asnOrg = match?.[2] ?? org;
+    return {
+      ip: data.ip ?? "",
+      asn,
+      asnOrg,
+      country: data.country ?? null,
+      looksHosted: readsAsHosting(asnOrg),
+    };
+  } catch (error) {
+    return {
+      ...empty,
+      error: error instanceof Error ? error.message : "exit check failed",
+    };
+  }
+}
+
+/**
+ * What the operator is told when they turn addresses off. Never a refusal: the
+ * switch exists for people who know their own network, and the classifier is a
+ * guess about an organisation name rather than a fact about a connection.
+ */
+export function describeDirectExit(check: ExitCheck): { ok: boolean; detail: string } {
+  if (check.error) return { ok: false, detail: `Could not read this server's address: ${check.error}` };
+  if (!check.ip) return { ok: false, detail: "Could not read this server's address." };
+  const network = check.asnOrg ?? "an unnamed network";
+  const where = check.country ? ` in ${check.country}` : "";
+  if (check.looksHosted) {
+    return {
+      ok: false,
+      detail: `LinkedIn will see ${check.ip}${where} on ${network}, which reads as a hosting network rather than a consumer ISP. Accounts signing in from one of those are the ones that get challenged.`,
+    };
+  }
+  return {
+    ok: true,
+    detail: `LinkedIn will see ${check.ip}${where} on ${network}, which reads as a consumer ISP rather than a hosting network.`,
+  };
+}
+
+/**
  * The gate before an address is bound to a customer's LinkedIn account.
  *
  * Unreachable is a hard no, because an address that cannot answer now will not

@@ -2,7 +2,7 @@ import { log, logError } from "../logger.ts";
 import { requestReSignIn } from "../db.ts";
 import { closeSession, isSignedIn, openSession } from "../browser/driver.ts";
 import type { Session } from "../browser/driver.ts";
-import { allocationFor, isProduction } from "../proxy/allocation.ts";
+import { allocationFor, requiresAllocation } from "../proxy/allocation.ts";
 import { NoSlotError, takeSlot } from "../safety/slots.ts";
 import { withWatchdog } from "../safety/watchdog.ts";
 import { currentVisit } from "../safety/rhythm.ts";
@@ -89,7 +89,7 @@ async function accountsFor(posts: StalePost[]): Promise<Map<string, Account>> {
 
 async function readAccount(account: Account, posts: StalePost[]): Promise<void> {
   const address = await allocationFor(account.id);
-  if (!address && isProduction()) {
+  if (!address && (await requiresAllocation())) {
     log("insights deferred: no address allocated yet", { accountId: account.id });
     return;
   }

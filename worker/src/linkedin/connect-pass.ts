@@ -1,7 +1,7 @@
 import { db } from "../db.ts";
 import { log, logError } from "../logger.ts";
 import { closeSession, isSignedIn, openSession } from "../browser/driver.ts";
-import { allocationFor, isProduction } from "../proxy/allocation.ts";
+import { allocationFor, requiresAllocation } from "../proxy/allocation.ts";
 import { NoSlotError, takeSlot } from "../safety/slots.ts";
 import { SignInFailed } from "./signin.ts";
 import { withWatchdog } from "../safety/watchdog.ts";
@@ -195,7 +195,7 @@ async function loadWaiting(): Promise<Waiting[]> {
 async function connectOne(account: Waiting): Promise<void> {
   const address = await allocationFor(account.id);
   if (!address) {
-    if (isProduction()) {
+    if (await requiresAllocation()) {
       // The address is still being set up. Signing in from the server's own
       // address now would teach LinkedIn a location the account will never use
       // again, which is worse than waiting a minute.

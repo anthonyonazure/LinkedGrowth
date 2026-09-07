@@ -1,10 +1,10 @@
-/** Where dedicated addresses come from: Proxy-Seller with the instance's own key, or nowhere. */
+/** Where dedicated addresses come from: Proxy-Seller with the instance's own key, a proxy the customer already owns, or this server's own connection. */
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { isSelfHosted } from "@/lib/edition";
 import { encryptSecret, getInstanceSettings, instanceSecrets, updateInstanceSettings } from "@/lib/instance-settings";
 import { rateLimit, AUTH_RATE_LIMITS } from "@/lib/rate-limit";
-import { oneOf, secret, ValidationError } from "@/lib/setup/fields";
+import { boolean, oneOf, secret, ValidationError } from "@/lib/setup/fields";
 import { proxySection } from "@/lib/setup/status";
 
 const PROVIDERS = ["none", "proxy-seller"] as const;
@@ -28,6 +28,17 @@ export async function PATCH(request: NextRequest) {
     const provider = oneOf(body.provider, PROVIDERS, "Provider");
     if (!provider) return NextResponse.json({ error: "Provider is required." }, { status: 400 });
     const apiKey = secret(body.apiKey, "Proxy-Seller API key");
+    const directEgress = boolean(body.directEgress, "Use this server's connection");
+
+    // The two are exclusive by construction: buying addresses and refusing to
+    // use one are opposite answers to the same question, and a row holding
+    // both would leave the worker deciding which the operator meant.
+    if (directEgress && provider === "proxy-seller") {
+      return NextResponse.json(
+        { error: "Buy addresses or send from this server's connection, not both." },
+        { status: 400 }
+      );
+    }
 
     const current = await getInstanceSettings(true);
     const hasKey = apiKey ? true : apiKey === undefined && !!current.proxySellerKeyEncrypted;
@@ -37,6 +48,7 @@ export async function PATCH(request: NextRequest) {
 
     const row = await updateInstanceSettings({
       proxyProvider: provider,
+      ...(directEgress !== undefined ? { directEgress } : {}),
       ...(apiKey !== undefined ? { proxySellerKeyEncrypted: apiKey === null ? null : encryptSecret(apiKey) } : {}),
     });
     const secrets = await instanceSecrets();

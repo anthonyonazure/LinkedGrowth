@@ -15,6 +15,8 @@ export interface InstanceSecrets {
   agentDailyCapUsd: number;
   accountMonthlyCapUsd: number;
   proxySellerKey: string | null;
+  /** True when this instance acts from the server's own connection and an account needs no address of its own. */
+  directEgress: boolean;
   cronSecret: string | null;
   adminEmail: string | null;
   appUrl: string | null;
@@ -50,6 +52,9 @@ export async function instanceFor(edition: Edition, env: Record<string, string |
       agentDailyCapUsd: 1.0,
       accountMonthlyCapUsd: 12.0,
       proxySellerKey: fromEnv("PROXY_SELLER_API_KEY"),
+      // Never in the cloud. One shared address for every customer's account is
+      // the failure this whole subsystem exists to prevent.
+      directEgress: false,
       cronSecret: null,
       adminEmail: null,
       appUrl: fromEnv("APP_URL"),
@@ -76,6 +81,7 @@ export async function instanceFor(edition: Edition, env: Record<string, string |
     agentDailyCapUsd: Number(r.agent_daily_cap_usd ?? 1),
     accountMonthlyCapUsd: Number(r.account_monthly_cap_usd ?? 12),
     proxySellerKey: dec(r.proxy_seller_key_encrypted),
+    directEgress: Number(r.direct_egress ?? 0) === 1,
     cronSecret: dec(r.cron_secret_encrypted),
     adminEmail: text(r.admin_email),
     appUrl: text(r.app_url),

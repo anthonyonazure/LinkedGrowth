@@ -42,6 +42,8 @@ export interface AiSection {
 export interface ProxySection {
   provider: InstanceSettings["proxyProvider"];
   keyMask: string | null;
+  /** True when every account acts from this server's own connection and no address is bought or brought. */
+  directEgress: boolean;
   serverIp: string | null;
 }
 
@@ -115,6 +117,7 @@ export function proxySection(row: InstanceSettings, secrets: Secrets): ProxySave
   return {
     provider: row.proxyProvider,
     keyMask: maskSecret(secrets.proxySellerKey),
+    directEgress: row.directEgress,
   };
 }
 
@@ -168,13 +171,18 @@ export async function serverPublicIp(): Promise<string | null> {
 
 /**
  * The whole status. The public address costs a network call, so it is looked
- * up only when Proxy-Seller is the provider (their allowlist needs it) or when
- * the caller asks for it, which the wizard's dedicated IP step does.
+ * up only when Proxy-Seller is the provider (their allowlist needs it), when
+ * the instance acts from its own connection and the operator needs to see the
+ * address that stands for it, or when the caller asks, which the wizard's
+ * dedicated IP step does.
  */
 export async function setupStatus(options: { withIp: boolean }): Promise<SetupStatus> {
   const row = await getInstanceSettings(true);
   const secrets = await instanceSecrets();
-  const serverIp = options.withIp || row.proxyProvider === "proxy-seller" ? await serverPublicIp() : null;
+  const serverIp =
+    options.withIp || row.proxyProvider === "proxy-seller" || row.directEgress
+      ? await serverPublicIp()
+      : null;
   return {
     edition: EDITION,
     setupCompleted: row.setupCompleted,
