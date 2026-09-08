@@ -36,3 +36,7 @@ Images and carousels attached to posts live here. Local disk keeps them in the `
 ## Review
 
 A summary of the 5 steps and one checkbox, close sign ups, checked by default: only people you invite from the Team page can create an account. Finish, and the next screen creates your first agent.
+
+## Running the wizard again
+
+Settings, Instance has a Run setup again button for administrators. It reopens the 6 steps with every value you have already saved still in the fields, so it is a walk through rather than a fresh start. No key, address or storage setting is cleared. The dashboard stays shut while the wizard is open, the same rule a new install lives under, so finish the wizard to get it back.

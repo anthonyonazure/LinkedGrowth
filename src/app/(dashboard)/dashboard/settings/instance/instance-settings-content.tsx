@@ -33,8 +33,8 @@ export function InstanceSettingsContent({ adminEmail }: { adminEmail: string }) 
   const [status, setStatus] = useState<SetupStatus | null>(null);
   const [forms, setForms] = useState<Forms | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [saving, setSaving] = useState<Area | "signups" | "cron" | null>(null);
-  const [notices, setNotices] = useState<Partial<Record<Area | "signups" | "cron", Notice>>>({});
+  const [saving, setSaving] = useState<Area | "signups" | "cron" | "reopen" | null>(null);
+  const [notices, setNotices] = useState<Partial<Record<Area | "signups" | "cron" | "reopen", Notice>>>({});
   const [tests, setTests] = useState<Tests>(NO_TESTS);
 
   useEffect(() => {
@@ -107,6 +107,26 @@ export function InstanceSettingsContent({ adminEmail }: { adminEmail: string }) 
     }
     setStatus((s) => (s ? { ...s, cronSecretMask: result.data.secret } : s));
     setNotices((n) => ({ ...n, cron: { type: "success", text: "Saved" } }));
+  };
+
+  const reopenSetup = async () => {
+    setSaving("reopen");
+    const result = await request<{ next: string; readyInMs: number }>("/api/setup/reopen", "POST");
+    if (!result.ok) {
+      setSaving(null);
+      setNotices((n) => ({ ...n, reopen: { type: "error", text: result.error } }));
+      return;
+    }
+    setNotices((n) => ({
+      ...n,
+      reopen: { type: "success", text: "Reopening the wizard. Every setting you have is still there." },
+    }));
+    // The middleware answers from a short window, so a redirect sent this
+    // instant can land back on the dashboard. Waiting it out costs a few
+    // seconds and removes the bounce entirely.
+    window.setTimeout(() => {
+      window.location.href = result.data.next;
+    }, result.data.readyInMs);
   };
 
   return (
@@ -197,6 +217,30 @@ export function InstanceSettingsContent({ adminEmail }: { adminEmail: string }) 
               <Button type="button" variant="outline" onClick={() => void rotateCron()} disabled={saving === "cron"}>
                 {saving === "cron" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Regenerate cron secret
+              </Button>
+            </FieldActions>
+          </Section>
+
+          <Section
+            heading="Run setup again"
+            intro="Walk the 6 steps of the first login wizard with everything you have already saved in the fields. Nothing is cleared and no key is lost."
+            notice={notices.reopen}
+          >
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/40">
+              <p className="text-sm text-amber-900 dark:text-amber-200">
+                The dashboard stays shut while the wizard is open, the same rule a new install lives under. Finish the wizard to get it back.
+              </p>
+            </div>
+            <FieldActions>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void reopenSetup()}
+                disabled={saving === "reopen"}
+                data-testid="reopen-setup"
+              >
+                {saving === "reopen" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Run setup again
               </Button>
             </FieldActions>
           </Section>

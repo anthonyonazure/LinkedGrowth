@@ -41,10 +41,15 @@ const PAYWALL_ALLOWED_API_PREFIXES = [
   "/api/linkedin/accounts",
 ];
 
-// Self hosted: once the wizard has run it stays run, so the instance row is
-// read only until it says so, then this latch answers for the life of the
-// process.
+// Self hosted: the wizard can be reopened from Settings, Instance, so a latch
+// for the life of the process would keep sending an administrator who asked
+// for it back to the dashboard. A done answer is held for a few seconds
+// instead: steady state costs one read per window rather than one per request,
+// and a reopened wizard opens within that window. A not done answer is still
+// read fresh every time, so finishing lets you straight in.
 let setupDone = false;
+let setupDoneAt = 0;
+const SETUP_DONE_TTL_MS = 5_000;
 
 // Wrapper: intercept signout BEFORE auth() touches the request
 const authProxy = auth(async (req) => {
@@ -103,13 +108,16 @@ const authProxy = auth(async (req) => {
 
   // Self hosted: nothing in the dashboard opens before the setup wizard has
   // run, and the wizard closes once it has. A non admin lands on the wizard
-  // page too, where it shows the waiting card rather than a redirect. Until
-  // the latch is set the row is read fresh: the proxy is its own bundle, so
-  // the cache the routes invalidate when the wizard finishes is not this one.
+  // page too, where it shows the waiting card rather than a redirect. The row
+  // is read fresh here: the proxy is its own bundle, so the cache the routes
+  // invalidate when the wizard finishes is not this one.
   if (isSelfHosted() && isLoggedIn) {
     const isSetupRoute = nextUrl.pathname === "/setup";
     if (isProtectedRoute || isSetupRoute) {
-      if (!setupDone) setupDone = (await getInstanceSettings(true)).setupCompleted;
+      if (!setupDone || Date.now() - setupDoneAt > SETUP_DONE_TTL_MS) {
+        setupDone = (await getInstanceSettings(true)).setupCompleted;
+        setupDoneAt = Date.now();
+      }
       if (isProtectedRoute && !setupDone) {
         return NextResponse.redirect(new URL("/setup", nextUrl));
       }
